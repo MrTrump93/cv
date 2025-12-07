@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nguyen Bao Trung - VFX Artist Portfolio</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fafaf9;
+            /* Stone-50 */
+            color: #44403c;
+            /* Stone-700 */
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        .display-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f5f5f4;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d6d3d1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a29e;
+        }
+
+        /* Chart Container Strict Styling */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            /* Constraint */
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        /* Card Hover Effects */
+        .interactive-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .interactive-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Timeline Node Active State */
+        .timeline-node.active {
+            background-color: #ea580c;
+            /* Orange-600 */
+            border-color: #ea580c;
+            color: white;
+        }
+
+        /* Particle Canvas */
+        #heroCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.6;
+        }
+
+        /* Utility for text truncation */
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+
+    <!-- Placeholder Comments -->
+    <!-- Chosen Palette: Warm Neutrals (Stone/Beige) with Burnt Orange Accents (#fafaf9 bg, #44403c text, #ea580c accent). Chosen for professional calm with creative energy. -->
+    <!-- Application Structure Plan: 
+         1. Hero Section: Immediate visual impact with Canvas particles (showcasing VFX skill) + Introduction.
+         2. Strategic Overview: "At a Glance" stats to parse key info quickly.
+         3. Skill Ecosystem: Radar Chart to visualize the profile shape (Technical vs Artistic) + detailed list.
+         4. Career Journey: Interactive Vertical Timeline. Instead of a long scroll, users click roles to see details, saving space and focusing attention.
+         5. Gamefolio: Grid of projects with hover details. 
+         6. Contact: Clean footer.
+         Why? This structure moves from high-level impression to detailed evidence, engaging the user to explore the candidate's journey.
+    -->
+    <!-- Visualization & Content Choices:
+         - Particle Canvas: Demonstrates "Unity Particle System" skill directly in browser -> Canvas API.
+         - Skill Radar: Visualizes the multi-disciplinary nature of a VFX artist (Code vs Art) -> Chart.js.
+         - Timeline: Organizes work history chronologically without clutter -> HTML/JS DOM manipulation.
+         - Project Grid: Visual grouping of "Achievements" -> CSS Grid.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+
+<body class="antialiased selection:bg-orange-200 selection:text-orange-900">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-[#fafaf9]/90 backdrop-blur-sm border-b border-stone-200">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold tracking-tight text-stone-800">NB<span class="text-orange-600">.</span>Trung
+            </div>
+            <div class="hidden md:flex space-x-8 text-sm font-medium text-stone-600">
+                <a href="#overview" class="hover:text-orange-600 transition-colors">Overview</a>
+                <a href="#skills" class="hover:text-orange-600 transition-colors">Skills</a>
+                <a href="#experience" class="hover:text-orange-600 transition-colors">Experience</a>
+                <a href="#portfolio" class="hover:text-orange-600 transition-colors">Portfolio</a>
+                <a href="#contact"
+                    class="px-4 py-2 bg-stone-800 text-white rounded-full hover:bg-orange-600 transition-colors">Contact
+                    Me</a>
+            </div>
+            <!-- Mobile Menu Button (Simple implementation) -->
+            <button id="mobileMenuBtn" class="md:hidden text-stone-800 font-bold text-xl">☰</button>
+        </div>
+        <!-- Mobile Nav Panel -->
+        <div id="mobileNav" class="hidden md:hidden bg-stone-100 border-b border-stone-200">
+            <div class="flex flex-col p-4 space-y-3">
+                <a href="#overview" class="block text-stone-700">Overview</a>
+                <a href="#skills" class="block text-stone-700">Skills</a>
+                <a href="#experience" class="block text-stone-700">Experience</a>
+                <a href="#portfolio" class="block text-stone-700">Portfolio</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative w-full h-[600px] flex items-center justify-center overflow-hidden bg-stone-100">
+        <canvas id="heroCanvas"></canvas>
+
+        <div class="relative z-10 container mx-auto px-6 text-center">
+            <p class="text-orange-600 font-bold tracking-widest uppercase mb-4 text-sm animate-pulse">VFX Artist & 3D
+                Generalist</p>
+            <h1 class="text-5xl md:text-7xl font-bold text-stone-900 mb-6 leading-tight">
+                Nguyen Bao Trung
+            </h1>
+            <p class="text-xl md:text-2xl text-stone-600 max-w-2xl mx-auto mb-10 font-light">
+                Bridging the gap between <span class="font-semibold text-stone-800">technical logic</span> and <span
+                    class="font-semibold text-stone-800">artistic vision</span> to create stunning visual experiences
+                for games.
+            </p>
+            <div class="flex flex-col md:flex-row justify-center gap-4">
+                <a href="#contact"
+                    class="px-8 py-3 bg-orange-600 text-white rounded-lg font-medium shadow-lg shadow-orange-600/20 hover:bg-orange-700 hover:shadow-orange-600/40 transition-all transform hover:-translate-y-1">
+                    Get in Touch
+                </a>
+                <a href="https://behance.net/trungnguyn210" target="_blank"
+                    class="px-8 py-3 bg-white text-stone-800 border border-stone-300 rounded-lg font-medium hover:bg-stone-50 transition-colors flex items-center justify-center gap-2">
+                    <span>View Behance</span>
+                    <span class="text-xl">↗</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-stone-400">
+            <span class="text-2xl">↓</span>
+        </div>
+    </header>
+
+    <!-- Strategic Overview (Intro) -->
+    <section id="overview" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <!-- Text Content -->
+                <div>
+                    <h2 class="text-3xl font-bold text-stone-900 mb-6 border-l-4 border-orange-500 pl-4">Objective &
+                        Profile</h2>
+                    <p class="text-stone-600 mb-6 leading-relaxed">
+                        I am a dedicated <strong>VFX Artist</strong> with a unique background in data analysis, allowing
+                        me to approach visual effects with both creative flair and structural precision. My goal is to
+                        leverage my expertise in <strong>motion graphics, 3D modeling, and Unity integration</strong> to
+                        produce high-quality, optimized visuals for the gaming industry.
+                    </p>
+                    <p class="text-stone-600 mb-6 leading-relaxed">
+                        Currently seeking opportunities to work with professional teams where I can utilize my full
+                        stack of skills—from <strong>Autodesk Maya</strong> rigging to <strong>Shader Graph</strong>
+                        implementation—to bring characters and scenes to life.
+                    </p>
+
+                    <!-- Quick Stats Row -->
+                    <div class="grid grid-cols-3 gap-4 mt-8 border-t border-stone-100 pt-8">
+                        <div class="text-center">
+                            <span class="block text-3xl font-bold text-stone-800" id="stat-years">3+</span>
+                            <span class="text-xs uppercase tracking-wide text-stone-500">Years VFX</span>
+                        </div>
+                        <div class="text-center">
+                            <span class="block text-3xl font-bold text-stone-800" id="stat-projects">6+</span>
+                            <span class="text-xs uppercase tracking-wide text-stone-500">Games Shipped</span>
+                        </div>
+                        <div class="text-center">
+                            <span class="block text-3xl font-bold text-stone-800">100%</span>
+                            <span class="text-xs uppercase tracking-wide text-stone-500">Commitment</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="p-6 bg-stone-50 rounded-xl interactive-card">
+                        <div class="text-orange-500 text-2xl mb-3">★</div>
+                        <h3 class="font-bold text-stone-800 mb-2">Game VFX</h3>
+                        <p class="text-sm text-stone-600">Creating exciting visuals for games and commercials using
+                            Unity and Particle Systems.</p>
+                    </div>
+                    <div class="p-6 bg-stone-50 rounded-xl interactive-card">
+                        <div class="text-orange-500 text-2xl mb-3">◈</div>
+                        <h3 class="font-bold text-stone-800 mb-2">3D Generalist</h3>
+                        <p class="text-sm text-stone-600">Modeling, texturing, lighting, rigging, and rendering to
+                            create stunning assets.</p>
+                    </div>
+                    <div class="p-6 bg-stone-50 rounded-xl interactive-card">
+                        <div class="text-orange-500 text-2xl mb-3">⟳</div>
+                        <h3 class="font-bold text-stone-800 mb-2">Animation</h3>
+                        <p class="text-sm text-stone-600">Bringing life to characters using Spine 2D and 3D animation
+                            tools.</p>
+                    </div>
+                    <div class="p-6 bg-stone-50 rounded-xl interactive-card">
+                        <div class="text-orange-500 text-2xl mb-3">⚡</div>
+                        <h3 class="font-bold text-stone-800 mb-2">Tech Art</h3>
+                        <p class="text-sm text-stone-600">Shader Graph proficiency & collaboration with Technical
+                            Artists on visual benchmarks.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skill Ecosystem -->
+    <section id="skills" class="py-20 bg-stone-100">
+        <div class="container mx-auto px-6">
+            <div class="mb-12 text-center md:text-left">
+                <h2 class="text-3xl font-bold text-stone-900 mb-4">Technical & Artistic Proficiency</h2>
+                <p class="text-stone-600 max-w-2xl">
+                    My skillset balances the technical requirements of game engines with the artistic requirements of
+                    visual storytelling.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <!-- Radar Chart -->
+                <div
+                    class="bg-white p-6 rounded-2xl shadow-sm border border-stone-200 flex flex-col items-center justify-center">
+                    <h3 class="text-lg font-semibold text-stone-700 mb-4 text-center w-full">Skill Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="skillsChart"></canvas>
+                    </div>
+                    <p class="text-xs text-stone-400 mt-4 text-center">Interactive Radar Chart: Hover points for values
+                    </p>
+                </div>
+
+                <!-- Interactive Skill List -->
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-xl border-l-4 border-orange-500 shadow-sm interactive-card">
+                        <h3 class="text-xl font-bold text-stone-800 mb-2">Unity Engine Mastery</h3>
+                        <div class="w-full bg-stone-200 rounded-full h-2 mb-3">
+                            <div class="bg-orange-500 h-2 rounded-full" style="width: 90%"></div>
+                        </div>
+                        <p class="text-stone-600 text-sm">
+                            Expertise in <strong>Particle Systems</strong>, <strong>UI implementation</strong>, and
+                            <strong>Shader Graph</strong>. Capable of creating performant and visually striking
+                            real-time effects.
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border-l-4 border-stone-400 shadow-sm interactive-card">
+                        <h3 class="text-xl font-bold text-stone-800 mb-2">2D & 3D Animation</h3>
+                        <div class="w-full bg-stone-200 rounded-full h-2 mb-3">
+                            <div class="bg-stone-600 h-2 rounded-full" style="width: 85%"></div>
+                        </div>
+                        <p class="text-stone-600 text-sm">
+                            Proficient in <strong>Spine 2D</strong> for skeletal animation and <strong>Autodesk
+                                Maya</strong> for 3D rigging and animation sequences.
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border-l-4 border-stone-400 shadow-sm interactive-card">
+                        <h3 class="text-xl font-bold text-stone-800 mb-2">Design & Post-Processing</h3>
+                        <div class="w-full bg-stone-200 rounded-full h-2 mb-3">
+                            <div class="bg-stone-600 h-2 rounded-full" style="width: 80%"></div>
+                        </div>
+                        <p class="text-stone-600 text-sm">
+                            Strong workflow using <strong>Photoshop</strong> for texture creation and <strong>After
+                                Effects</strong> for motion graphics, compositing, and concepting.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Career Journey (Timeline) -->
+    <section id="experience" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-stone-900 mb-10 text-center">Professional Journey</h2>
+
+            <div class="flex flex-col md:flex-row gap-8">
+                <!-- Timeline Navigation (Left) -->
+                <div class="md:w-1/3 flex md:flex-col gap-4 overflow-x-auto md:overflow-visible pb-4 md:pb-0"
+                    id="timeline-nav">
+                    <!-- Generated by JS -->
+                </div>
+
+                <!-- Timeline Content (Right) -->
+                <div class="md:w-2/3 min-h-[400px]">
+                    <div id="timeline-content"
+                        class="bg-stone-50 p-8 rounded-2xl border border-stone-200 h-full shadow-lg transition-all duration-300">
+                        <!-- Content Injected Here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio / Achievements -->
+    <section id="portfolio" class="py-20 bg-stone-900 text-stone-100">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+                <div>
+                    <h2 class="text-3xl font-bold text-white mb-2">Game Projects</h2>
+                    <p class="text-stone-400">Selected titles I have contributed to as a VFX Artist.</p>
+                </div>
+                <!-- Filter buttons -->
+                <div class="flex gap-2 mt-4 md:mt-0">
+                    <button class="px-4 py-1 text-sm rounded-full bg-orange-600 text-white"
+                        onclick="filterProjects('all')">All</button>
+                    <button class="px-4 py-1 text-sm rounded-full bg-stone-700 text-stone-300 hover:bg-stone-600"
+                        onclick="filterProjects('Action')">Action</button>
+                    <button class="px-4 py-1 text-sm rounded-full bg-stone-700 text-stone-300 hover:bg-stone-600"
+                        onclick="filterProjects('Casual')">Casual</button>
+                </div>
+            </div>
+
+            <!-- Project Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="project-grid">
+                <!-- Projects injected by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Education & Footer -->
+    <footer id="contact" class="bg-stone-950 text-stone-400 py-16 border-t border-stone-800">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+                <!-- Brand -->
+                <div class="col-span-1 md:col-span-2">
+                    <h3 class="text-2xl font-bold text-white mb-4">NB.Trung</h3>
+                    <p class="mb-6 max-w-sm">
+                        Creative VFX Artist ready to bring high-quality visuals to your next game project. Open to
+                        full-time opportunities.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#"
+                            class="w-10 h-10 rounded-full bg-stone-800 flex items-center justify-center hover:bg-orange-600 transition-colors text-white">Bē</a>
+                        <a href="mailto:baotrungnguyen392@gmail.com"
+                            class="w-10 h-10 rounded-full bg-stone-800 flex items-center justify-center hover:bg-orange-600 transition-colors text-white">✉</a>
+                    </div>
+                </div>
+
+                <!-- Education -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase text-sm tracking-wider">Education</h4>
+                    <div class="mb-4">
+                        <span class="block text-stone-200 font-medium">Vinh University</span>
+                        <span class="text-sm text-stone-500">2012 - 2016</span>
+                        <p class="text-sm mt-1">Major: Natural Resources & Env. Management</p>
+                    </div>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 uppercase text-sm tracking-wider">Contact</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-start gap-3">
+                            <span class="text-orange-500">📍</span>
+                            <span>358 Bui Xuong Trach, Ha Noi</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span class="text-orange-500">☎</span>
+                            <span>0336370682</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span class="text-orange-500">@</span>
+                            <span>baotrungnguyen392@gmail.com</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-stone-900 mt-12 pt-8 text-center text-xs">
+                <p>&copy; 2025 Nguyen Bao Trung. Interactive Portfolio.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Logic Script -->
+    <script>
+        // --- DATA STORE ---
+        const appData = {
+            experience: [
+                {
+                    id: 1,
+                    role: "VFX Artist / Game Artist",
+                    company: "Icetea Labs / Mirai Studio",
+                    period: "2022 - 2025",
+                    description: "Responsible for the entire visual effects pipeline for mobile games. Collaborated deeply with game designers and technical artists to establish visual benchmarks.",
+                    tasks: [
+                        "Create creative ideas & solutions for visual tasks.",
+                        "Proactively communicate status to Leads & Designers.",
+                        "Collaborate with Tech Artists on features & benchmarks.",
+                        "Share artistic knowledge & support team members.",
+                        "Utilize Unity Particle System, Shader Graph, and Spine 2D."
+                    ],
+                    active: true
+                },
+                {
+                    id: 2,
+                    role: "Statistical Staff",
+                    company: "An Cuong JSC",
+                    period: "2017 - 2021",
+                    description: "Developed strong analytical skills and attention to detail while managing quantitative data. This experience honed my ability to solve problems systematically—a skill I now apply to technical art and optimization.",
+                    tasks: [
+                        "Collect quantitative data.",
+                        "Analyze and interpret data sets.",
+                        "Report findings to management.",
+                        "Ensure data accuracy and integrity."
+                    ],
+                    active: false
+                }
+            ],
+            projects: [
+                { title: "Power Gun: Shoot Em Down", category: "Action", icon: "🔫", desc: "Weapon VFX and impact particles." },
+                { title: "Bad Student: School Prank", category: "Casual", icon: "🎒", desc: "UI animations and character interactions." },
+                { title: "School Chaos: Craft & Prank", category: "Casual", icon: "🏫", desc: "Environment effects and crafting visuals." },
+                { title: "Space Cat: Chaos Return", category: "Action", icon: "🐱", desc: "Sci-fi shaders and projectile systems." },
+                { title: "Obby Escape: Parkour Runner", category: "Action", icon: "🏃", desc: "Movement trails and obstacle feedback." },
+                { title: "Brainy Prankster", category: "Casual", icon: "🧠", desc: "Puzzle effects and reward sequences." }
+            ]
+        };
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initMobileMenu();
+            initChart();
+            initTimeline();
+            initProjects();
+            initParticles();
+        });
+
+        // --- MOBILE MENU ---
+        function initMobileMenu() {
+            const btn = document.getElementById('mobileMenuBtn');
+            const nav = document.getElementById('mobileNav');
+            btn.addEventListener('click', () => {
+                nav.classList.toggle('hidden');
+            });
+        }
+
+        // --- CHART.JS ---
+        function initChart() {
+            const ctx = document.getElementById('skillsChart').getContext('2d');
+
+            // Custom config for Chart.js
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Unity / Tech Art', '2D Animation (Spine)', '3D Modeling (Maya)', 'Compositing (AE)', 'Texturing (PS)', 'Communication'],
+                    datasets: [{
+                        label: 'Proficiency Level',
+                        data: [90, 85, 75, 70, 85, 80],
+                        backgroundColor: 'rgba(234, 88, 12, 0.2)', // Orange-600 with opacity
+                        borderColor: '#ea580c',
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#ea580c',
+                        pointHoverBackgroundColor: '#ea580c',
+                        pointHoverBorderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#e7e5e4' },
+                            grid: { color: '#e7e5e4' },
+                            pointLabels: {
+                                font: {
+                                    size: 12,
+                                    family: "'Inter', sans-serif"
+                                },
+                                color: '#44403c'
+                            },
+                            ticks: { display: false, max: 100 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // --- TIMELINE LOGIC ---
+        function initTimeline() {
+            const navContainer = document.getElementById('timeline-nav');
+            const contentContainer = document.getElementById('timeline-content');
+
+            // Render Nav
+            appData.experience.forEach((job, index) => {
+                const btn = document.createElement('button');
+                btn.className = `timeline-node w-full text-left p-4 rounded-lg border border-stone-200 bg-white shadow-sm hover:shadow-md transition-all mb-0 ${index === 0 ? 'active' : ''}`;
+                btn.innerHTML = `
+                    <span class="block text-xs font-bold uppercase tracking-wider opacity-70 mb-1">${job.period}</span>
+                    <span class="block font-bold text-lg">${job.role}</span>
+                    <span class="block text-sm opacity-80">${job.company}</span>
+                `;
+                btn.onclick = () => renderTimelineContent(job.id);
+                navContainer.appendChild(btn);
+            });
+
+            // Render Initial Content
+            renderTimelineContent(1);
+        }
+
+        function renderTimelineContent(id) {
+            const job = appData.experience.find(j => j.id === id);
+            const container = document.getElementById('timeline-content');
+
+            // Update active state on buttons
+            document.querySelectorAll('.timeline-node').forEach(btn => {
+                if (btn.innerHTML.includes(job.role)) {
+                    btn.classList.add('active');
+                    btn.classList.add('ring-2');
+                    btn.classList.add('ring-orange-200');
+                } else {
+                    btn.classList.remove('active');
+                    btn.classList.remove('ring-2');
+                    btn.classList.remove('ring-orange-200');
+                }
+            });
+
+            // Animate content change
+            container.style.opacity = '0';
+            setTimeout(() => {
+                container.innerHTML = `
+                    <div class="flex flex-col h-full">
+                        <div class="mb-6">
+                            <h3 class="text-2xl font-bold text-stone-800">${job.role}</h3>
+                            <div class="text-orange-600 font-medium text-lg mb-2">${job.company}</div>
+                            <div class="inline-block bg-stone-200 px-3 py-1 rounded-full text-xs font-bold text-stone-600">${job.period}</div>
+                        </div>
+                        <div class="prose prose-stone max-w-none mb-6">
+                            <p class="text-stone-600 italic border-l-4 border-stone-300 pl-4 py-1 bg-stone-100/50 rounded-r">
+                                ${job.description}
+                            </p>
+                        </div>
+                        <div class="mt-auto">
+                            <h4 class="font-bold text-stone-800 mb-3 uppercase text-xs tracking-wider">Key Responsibilities</h4>
+                            <ul class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                ${job.tasks.map(task => `
+                                    <li class="flex items-start gap-2 text-sm text-stone-600">
+                                        <span class="text-orange-500 mt-1">▹</span>
+                                        <span>${task}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                container.style.opacity = '1';
+            }, 200);
+        }
+
+        // --- PROJECTS LOGIC ---
+        function initProjects() {
+            renderProjects('all');
+        }
+
+        function filterProjects(cat) {
+            renderProjects(cat);
+        }
+
+        function renderProjects(category) {
+            const grid = document.getElementById('project-grid');
+            grid.innerHTML = '';
+
+            const filtered = category === 'all'
+                ? appData.projects
+                : appData.projects.filter(p => p.category === category);
+
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'bg-stone-800 rounded-xl p-6 border border-stone-700 hover:border-orange-500 transition-all group interactive-card';
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-4xl bg-stone-700 w-16 h-16 flex items-center justify-center rounded-lg group-hover:scale-110 transition-transform">${p.icon}</span>
+                        <span class="text-xs font-bold border border-stone-600 text-stone-400 px-2 py-1 rounded uppercase">${p.category}</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-orange-400 transition-colors">${p.title}</h3>
+                    <p class="text-stone-400 text-sm">${p.desc}</p>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // --- PARTICLE SYSTEM (CANVAS) ---
+        // Simple particle system to mimic Unity Particle System skill
+        function initParticles() {
+            const canvas = document.getElementById('heroCanvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+
+            function resize() {
+                canvas.width = canvas.parentElement.offsetWidth;
+                canvas.height = canvas.parentElement.offsetHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 3 + 1;
+                    this.speedX = Math.random() * 1 - 0.5;
+                    this.speedY = Math.random() * 1 - 0.5;
+                    this.color = Math.random() > 0.9 ? '#ea580c' : '#d6d3d1'; // Orange or Stone-300
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    if (this.size > 0.2) this.size -= 0.01;
+                    if (this.size <= 0.2) {
+                        this.x = Math.random() * canvas.width;
+                        this.y = Math.random() * canvas.height;
+                        this.size = Math.random() * 3 + 1;
+                    }
+                }
+                draw() {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            function init() {
+                for (let i = 0; i < 50; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+                requestAnimationFrame(animate);
+            }
+
+            init();
+            animate();
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nguyen Bao Trung - Select Language</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fafaf9;
+            /* Stone-50 */
+            color: #44403c;
+            /* Stone-700 */
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Particle Background (Simplified version of portfolio) */
+        #bgCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        .lang-card {
+            transition: all 0.3s ease;
+        }
+
+        .lang-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(234, 88, 12, 0.2), 0 4px 6px -2px rgba(234, 88, 12, 0.1);
+            border-color: #ea580c;
+        }
+    </style>
+</head>
+
+<body class="h-screen w-full overflow-hidden flex items-center justify-center relative">
+
+    <!-- Canvas Background -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Main Modal -->
+    <div
+        class="relative z-10 bg-white p-8 md:p-12 rounded-2xl shadow-2xl max-w-lg w-full mx-4 border border-stone-100 text-center">
+
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-stone-900 mb-2">Nguyen Bao Trung</h1>
+            <p class="text-stone-500 uppercase tracking-widest text-sm">VFX Artist Portfolio</p>
+        </div>
+
+        <div class="space-y-6">
+            <p class="text-stone-600 mb-8">Please select your language / Vui lòng chọn ngôn ngữ</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- English Option -->
+                <a href="BaoTrung.html"
+                    class="lang-card group flex flex-col items-center p-6 border-2 border-stone-100 rounded-xl cursor-pointer hover:bg-stone-50">
+                    <span class="text-4xl mb-3">🇺🇸</span>
+                    <span class="font-bold text-stone-800 group-hover:text-orange-600 transition-colors">English</span>
+                    <span class="text-xs text-stone-400 mt-1">International</span>
+                </a>
+
+                <!-- Vietnamese Option -->
+                <a href="BaoTrung_vi.html"
+                    class="lang-card group flex flex-col items-center p-6 border-2 border-stone-100 rounded-xl cursor-pointer hover:bg-stone-50">
+                    <span class="text-4xl mb-3">🇻🇳</span>
+                    <span class="font-bold text-stone-800 group-hover:text-orange-600 transition-colors">Tiếng
+                        Việt</span>
+                    <span class="text-xs text-stone-400 mt-1">Việt Nam</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-10 text-xs text-stone-300">
+            &copy; 2025 NB.Trung
+        </div>
+    </div>
+
+    <script>
+        // Simple ambient particle background
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2 + 1;
+                this.color = Math.random() > 0.5 ? '#ea580c' : '#d6d3d1';
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0) this.x = width;
+                if (this.x > width) this.x = 0;
+                if (this.y < 0) this.y = height;
+                if (this.y > height) this.y = 0;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 30; i++) particles.push(new Particle());
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+
+</html>
